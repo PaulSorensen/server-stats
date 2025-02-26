@@ -14,8 +14,8 @@
 #  https://buymeacoffee.com/paulsorensen
 ################################################################################
 
-RED='\033[0;31m'
-BLUE='\033[1;34m'
+RED='\033[38;2;255;0;127m'
+BLUE='\033[38;5;81m'
 YELLOW='\033[38;2;223;245;13m'
 NC='\033[0m'
 echo -e "${BLUE}Server Stats by paulsorensen.io${NC}\n"
