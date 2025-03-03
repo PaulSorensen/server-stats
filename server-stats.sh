@@ -4,8 +4,8 @@
 #  Author      : Paul Sørensen
 #  Website     : https://paulsorensen.io
 #  GitHub      : https://github.com/paulsorensen
-#  Version     : 1.0
-#  Last Update : 25.02.2025
+#  Version     : 1.1
+#  Last Update : 03.03.2025
 #
 #  Description:
 #  Provides a snapshot of key system information.
@@ -142,32 +142,106 @@ echo ""
 #  4. Logged-In Users
 ################################################################################
 
+# Function to clean IP address
+clean_ip() {
+    local ip=$1
+    ip=$(echo "$ip" | tr -d '()')
+    [ -z "$ip" ] && ip="Local"
+    echo "$ip"
+}
+
+# Function to format login time: YYYY-MM-DD HH:MM
+format_login_time() {
+    local date=$1
+    local time=$2
+    date -d "$date $time" +"%Y-%m-%d %H:%M" 2>/dev/null || echo "Unknown"
+}
+
+# Function to process 'who' line and return formatted fields
+process_who_line() {
+    local line=$1
+    # Split 'who' line into fields: User, Terminal, Date, Time, IP
+    read -r user terminal date time ip <<< "$line"
+    
+    # Clean IP address
+    ip=$(clean_ip "$ip")
+
+    # Format login time
+    login_time_formatted=$(format_login_time "$date" "$time")
+
+    # Return fields in printing order: User, Terminal, Login Time, IP/Host
+    echo "$user $terminal $login_time_formatted $ip"
+}
+
 echo -e "${YELLOW}Logged-In Users:${NC}"
-# Determine max width for User column
-max_user_width=$(who | awk '{print length($1)}' | sort -nr | head -n1)
-max_user_width=$((max_user_width > 4 ? max_user_width : 4))  # Minimum width
 
-# Define column spacing
+# Get 'who' output to analyze column lengths
+mapfile -t users < <(who 2>/dev/null)
+
+# Set fixed spacing for consistent gaps between columns
 space_between=5
-user_column_width=$((max_user_width + space_between))
-login_time_width=16  # Fixed width for login time
-terminal_width=10    # Enough for terminal names
-ip_width=20          # Fixed width for IP/hostname
 
-# Print headers
-printf "${BLUE}%-*s%-*s%-*s%-*s${NC}\n" "$user_column_width" "User" "$((login_time_width + space_between))" "Login Time" "$terminal_width" "Terminal" "$ip_width" "IP/Host"
+# Define column headers
+user_header="User"
+terminal_header="Terminal"
+login_time_header="Login Time"
+ip_host_header="IP/Host"
 
-# Process 'who' output
-who 2>/dev/null | while read -r user terminal date time ip; do
-    # Remove parentheses from IP and handle missing IP
-    ip=$(echo "$ip" | tr -d '()')  # Strip parentheses
-    [ -z "$ip" ] && ip="Local"     # Set "Local" if IP is empty
+# Get initial widths from header lengths
+user_header_len=${#user_header}
+terminal_header_len=${#terminal_header}
+login_time_header_len=${#login_time_header}
+ip_host_header_len=${#ip_host_header}
 
-    # Format login time (e.g., "2025-03-02 23:57" -> "2025-03-02 23:57")
-    login_time_formatted=$(date -d "$date $time" +"%Y-%m-%d %H:%M" 2>/dev/null || echo "Unknown")
+# Determine max widths dynamically, starting with header lengths
+max_user_width=$user_header_len
+max_terminal_width=$terminal_header_len
+max_login_time_width=$login_time_header_len
+max_ip_width=$ip_host_header_len
 
-    # Print formatted row
-    printf "${WHITE}%-*s%-*s%-*s%-*s${NC}\n" "$user_column_width" "$user" "$((login_time_width + space_between))" "$login_time_formatted" "$terminal_width" "$terminal" "$ip_width" "$ip"
+# Find longest content in each column (User, Terminal, Login Time, IP/Host) for dynamic sizing
+for line in "${users[@]}"; do
+    # Process the line and get formatted fields
+    read -r user terminal login_time_formatted ip <<< "$(process_who_line "$line")"
+
+    # Calculate lengths for printing order: User, Terminal, Login Time, IP/Host
+    user_len=${#user}
+    terminal_len=${#terminal}
+    ip_len=${#ip}
+
+    # Update max widths based on content length, matching print order
+    max_user_width=$(( user_len > max_user_width ? user_len : max_user_width ))
+    max_terminal_width=$(( terminal_len > max_terminal_width ? terminal_len : max_terminal_width ))
+    max_login_time_width=$(( ${#login_time_formatted} > max_login_time_width ? ${#login_time_formatted} : max_login_time_width ))
+    max_ip_width=$(( ip_len > max_ip_width ? ip_len : max_ip_width ))
+done
+
+# Ensure exactly 5 spaces between either column headers or column data,
+# using dynamic column widths based on content length, with explicit 5-space
+# gaps inserted where specified, though actual gaps may exceed 5 due to content.
+
+# Print headers with 5-space gaps, allowing dynamic width but inserting 5 spaces
+printf "${BLUE}%-${max_user_width}s" "$user_header"
+printf "%${space_between}s" ""
+printf "%-${max_terminal_width}s" "$terminal_header"
+printf "%${space_between}s" ""
+printf "%-${max_login_time_width}s" "$login_time_header"
+printf "%${space_between}s" ""
+printf "%s${NC}\n" "$ip_host_header"
+
+# Print data rows with 5-space gaps, adjusting dynamically for content
+for line in "${users[@]}"; do
+    # Process the line and get formatted fields
+    read -r user terminal login_time_formatted ip <<< "$(process_who_line "$line")"
+
+    # Print row with 5-space gaps, allowing dynamic adjustment
+    printf "${WHITE}%-${max_user_width}s" "$user"
+    printf "%${space_between}s" ""
+    printf "%-${max_terminal_width}s" "$terminal"
+    printf "%${space_between}s" ""
+    printf "%-${max_login_time_width}s" "$login_time_formatted"
+    printf "%${space_between}s" ""
+    printf "%s${NC}\n" "$ip"
 done
 
 echo ""
