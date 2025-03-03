@@ -143,25 +143,33 @@ echo ""
 ################################################################################
 
 echo -e "${YELLOW}Logged-In Users:${NC}"
-# Determine max width for each column dynamically
+# Determine max width for User column
 max_user_width=$(who | awk '{print length($1)}' | sort -nr | head -n1)
-max_user_width=$((max_user_width > 4 ? max_user_width : 4))  # Ensure minimum width
+max_user_width=$((max_user_width > 4 ? max_user_width : 4))  # Minimum width
 
-# Define static column spacing
+# Define column spacing
 space_between=5
 user_column_width=$((max_user_width + space_between))
-login_time_width=16  # Fixed width for formatted login time
-terminal_width=10  # Enough space for common terminal names
+login_time_width=16  # Fixed width for login time
+terminal_width=10    # Enough for terminal names
+ip_width=20          # Fixed width for IP/hostname
 
 # Print headers
-printf "${BLUE}%-*s%-*s%-*s${NC}\n" "$user_column_width" "User" "$((login_time_width + space_between))" "Login Time" "$terminal_width" "Terminal"
+printf "${BLUE}%-*s%-*s%-*s%-*s${NC}\n" "$user_column_width" "User" "$((login_time_width + space_between))" "Login Time" "$terminal_width" "Terminal" "$ip_width" "IP/Host"
 
-# Print users
-who 2>/dev/null | while read -r user terminal login_month login_day login_time _; do
-    # Format login time (e.g., "Feb 25 10:30" -> "2025-02-25 10:30")
-    login_time_formatted=$(date -d "$login_month $login_day $login_time" +"%Y-%m-%d %H:%M" 2>/dev/null)
-    printf "${WHITE}%-*s%-*s%-*s${NC}\n" "$user_column_width" "$user" "$((login_time_width + space_between))" "$login_time_formatted" "$terminal_width" "$terminal"
+# Process 'who' output
+who 2>/dev/null | while read -r user terminal date time ip; do
+    # Remove parentheses from IP and handle missing IP
+    ip=$(echo "$ip" | tr -d '()')  # Strip parentheses
+    [ -z "$ip" ] && ip="Local"     # Set "Local" if IP is empty
+
+    # Format login time (e.g., "2025-03-02 23:57" -> "2025-03-02 23:57")
+    login_time_formatted=$(date -d "$date $time" +"%Y-%m-%d %H:%M" 2>/dev/null || echo "Unknown")
+
+    # Print formatted row
+    printf "${WHITE}%-*s%-*s%-*s%-*s${NC}\n" "$user_column_width" "$user" "$((login_time_width + space_between))" "$login_time_formatted" "$terminal_width" "$terminal" "$ip_width" "$ip"
 done
+
 echo ""
 
 ################################################################################
