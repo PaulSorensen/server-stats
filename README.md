@@ -16,7 +16,12 @@
 - Lists top 10 memory and CPU-consuming processes.
 
 ## Requirements
-- None, enjoy :)
+The script requires mpstat from sysstat to be installed to fetch CPU info.
+```bash
+sudo apt install sysstat  # For Debian/Ubuntu
+sudo dnf install sysstat  # For Fedora
+sudo yum install sysstat  # For CentOS/RHEL
+```
 
 ## Usage
 Run the script directly from the terminal:
