@@ -10,7 +10,7 @@
 - Notifies about system updates and security patches.
 - Shows logged-in users and their active sessions.
 - Displays open public network ports.
-- Provides real-time network traffic statistics.
+- Displays network traffic.
 - Reports CPU and memory usage, including per-core utilization.
 - Reports disk space usage.
 - Lists top 10 memory and CPU-consuming processes.
@@ -44,7 +44,7 @@ If you want the script to run automatically every time you log in via SSH, follo
 
 2. Add the following line at the end of the file:
    ```bash
-   ~/server-stats.sh
+   ~/scripts/server-stats.sh
    ```
    *(Adjust the path if necessary to match the script's location.)*
 
