@@ -1,0 +1,39 @@
+###############################################################################################
+# Set variables to 'on' to enable features, or leave them empty to disable.
+# Example:
+# TIME=on 	#Feature is turned on.
+# TIME=		#Feature is turned off.
+###############################################################################################
+
+# Time
+TIME=on
+
+# Software Versions
+SOFTWARE_VERSIONS=on
+
+# System Updates Available
+SYSTEM_UPDATES=on
+
+# Logged-In Users
+LOGGED_IN_USERS=on
+
+# Public Ports
+PUBLIC_PORTS=on
+
+# Network Traffic
+NETWORK_TRAFFIC=on
+
+# CPU Info
+CPU_INFO=on
+
+# Memory Usage
+MEMORY_USAGE=on
+
+# Disk Space
+DISK_SPACE=on
+
+# Top 10 Memory Consuming Processes
+TOP_10_MEMORY=on
+
+# Top 10 CPU Consuming Processes
+TOP_10_CPU=on

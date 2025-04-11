@@ -14,6 +14,7 @@
 - Reports CPU and memory usage, including per-core utilization.
 - Reports disk space usage.
 - Lists top 10 memory and CPU-consuming processes.
+- Ability to turn features on/off.
 
 ## Requirements
 The script requires mpstat from sysstat to be installed to fetch CPU info.
@@ -24,10 +25,26 @@ sudo yum install sysstat  # For CentOS/RHEL
 ```
 
 ## Usage
-Run the script directly from the terminal:
+1. **Set up configuration file**:
+   - Copy the example config file:
+   ```bash
+   cp server-stats.conf.example server-stats.conf
+   ```  
+2. **Make the script executable**:
+   ```bash
+   chmod +x server-stats.sh
+   ```
+3. **Run the script**:
+   ```bash
+   ./server-stats.sh
+   ```
+
+## Configuration
+Edit server-stats.conf and set variables to 'on' to enable features, or leave them empty to disable. Example:
 
 ```bash
-./server-stats.sh
+   TIME=on   #Feature is turned on.
+   TIME=     #Feature is turned off.
 ```
 
 ## Automatically Execute on SSH Login
@@ -41,13 +58,10 @@ If you want the script to run automatically every time you log in via SSH, follo
    ```bash
    nano ~/.zshrc
    ```
-
-2. Add the following line at the end of the file:
+2. Add the following line at the end of the file (replace the path with your actual path):
    ```bash
-   ~/scripts/server-stats.sh
+   ~/scripts/server-stats/server-stats.sh
    ```
-   *(Adjust the path if necessary to match the script's location.)*
-
 3. Save and exit (in nano: press `CTRL + X`, then `Y`, then `Enter`).
 
 4. Apply the changes:

@@ -4,11 +4,21 @@
 #  Author      : Paul Sørensen
 #  Website     : https://paulsorensen.io
 #  GitHub      : https://github.com/paulsorensen
-#  Version     : 1.1
-#  Last Update : 03.03.2025
+#  Version     : 1.2
+#  Last Update : 12.04.2025
 #
 #  Description:
 #  Provides a snapshot of key system information.
+#
+#  Usage:
+#  1. Set up configuration file:
+#     cp server-stats.conf.example server-stats.conf
+#  2. Make the script executable: chmod +x server-stats.sh
+#  3. Run the script: ./server-stats.conf
+#
+#  Configuration:
+#  - Edit server-stats.conf and set variables to 'on' to enable features,
+#    or leave them empty to disable.
 #
 #  If you found this script useful, a small tip is appreciated ❤️
 #  https://buymeacoffee.com/paulsorensen
@@ -20,10 +30,20 @@ YELLOW='\033[38;2;223;245;13m'
 NC='\033[0m'
 echo -e "${BLUE}Server Stats by paulsorensen.io${NC}\n"
 
+# Check if server-stats.conf exists
+if [ ! -f "server-stats.conf" ]; then
+  echo -e "${RED}Error: server-stats.conf file not found. Make sure to edit and rename server-stats.conf.example before you run this script${NC}"
+  exit 1
+fi
+
+# Include source
+source ./server-stats.conf
+
 ################################################################################
 #  1. Time
 ################################################################################
 
+if [ "${TIME}" = "on" ]; then
 # System Time & Timezone
 system_time=$(date +"%H:%M:%S")
 timezone_name=$(timedatectl | grep "Time zone" | awk '{print $3}')
@@ -33,11 +53,13 @@ echo -e "${YELLOW}System Time:${NC} ${system_time} (${timezone_name} GMT${timezo
 # Uptime (Days, Hours, Minutes)
 uptime_info=$(uptime -p | sed 's/up //')
 echo -e "${YELLOW}Uptime:${NC} ${uptime_info}\n"
+fi
 
 ################################################################################
 #  2. Software Versions
 ################################################################################
 
+if [ "${SOFTWARE_VERSIONS}" = "on" ]; then
 # OS
 OS=$(grep '^PRETTY_NAME=' /etc/os-release | cut -d= -f2 | tr -d '"')
 kernel=$(uname -r)
@@ -120,11 +142,13 @@ if command -v ravendb >/dev/null; then
     echo -e "${YELLOW}RavenDB Version:${NC} ${ravendb_version}"
 fi
 echo ""
+fi
 
 ################################################################################
 #  3. System Updates Available
 ################################################################################
 
+if [ "${SYSTEM_UPDATES}" = "on" ]; then
 echo -e "${YELLOW}System Updates Available:${NC}"
 total_updates=$(apt list --upgradable 2>/dev/null | grep -v '^Listing...' | wc -l)
 critical_updates=$(apt list --upgradable 2>/dev/null | grep -v '^Listing...' | grep -i 'security' | wc -l)
@@ -137,11 +161,13 @@ else
     echo -e "${BLUE}Critical:${NC} ${critical_updates}" # Normal Blue
 fi
 echo ""
+fi
 
 ################################################################################
 #  4. Logged-In Users
 ################################################################################
 
+if [ "${LOGGED_IN_USERS}" = "on" ]; then
 # Function to clean IP address
 clean_ip() {
     local ip=$1
@@ -245,11 +271,13 @@ for line in "${users[@]}"; do
 done
 
 echo ""
+fi
 
 ################################################################################
 #  5. Public Ports
 ################################################################################
 
+if [ "${PUBLIC_PORTS}" = "on" ]; then
 echo -e "${YELLOW}Public Ports:${NC}"
 ss -tuln | awk '
     NR > 1 && $1 ~ /^(tcp|udp)$/ && $5 !~ /127\.|%lo|\[::1\]/ {
@@ -302,11 +330,13 @@ ss -tuln | awk '
     END { if (NR % 5 != 0) print "" }
 '
 echo ""
+fi
 
 ################################################################################
 #  6. Network Traffic
 ################################################################################
 
+if [ "${NETWORK_TRAFFIC}" = "on" ]; then
 echo -e "${YELLOW}Network Traffic:${NC}"
 printf "${BLUE}%-13s %-13s %-13s${NC}\n" "Interface" "In (MB/s)" "Out (MB/s)"
 if [ -f /proc/net/dev ]; then
@@ -328,11 +358,13 @@ else
     echo -e "${WHITE}Network stats unavailable${NC}"
 fi
 echo ""
+fi
 
 ################################################################################
 #  7. CPU Info
 ################################################################################
 
+if [ "${CPU_INFO}" = "on" ]; then
 echo -e "${YELLOW}CPU Info:${NC}"
 cores=$(nproc)
 
@@ -386,29 +418,35 @@ mpstat -P ALL 1 1 | awk -v cores_per_row="$cores_per_row" -v core_w="$core_label
 }
 END { if (core_count % cores_per_row != 0) print "" }'
 echo ""
+fi
 
 ################################################################################
 #  8. Memory Usage
 ################################################################################
 
+if [ "${MEMORY_USAGE}" = "on" ]; then
 echo -e "${YELLOW}Memory Usage:${NC}"
 total_mem=$(free -m | awk '/Mem:/{printf "%.1f", $2/1024}')
 used_mem=$(free -m | awk '/Mem:/{printf "%.1f", $3/1024}')
 mem_pct=$(free | awk '/Mem:/{printf "%.1f", ($3/$2)*100}')
 echo -e "${NC}${used_mem}/${total_mem}GB (${mem_pct}% used)${NC}\n"
+fi
 
 ################################################################################
 #  9. Disk Space
 ################################################################################
 
+if [ "${DISK_SPACE}" = "on" ]; then
 echo -e "${YELLOW}Disk Space:${NC}"
 df -BG / | awk 'NR==2 {used=$3+0; total=$2+0; print used "/" total "GB (" $5 " used)"}'
 echo ""
+fi
 
 ################################################################################
 #  10. Top 10 Memory Consuming Processes
 ################################################################################
 
+if [ "${TOP_10_MEMORY}" = "on" ]; then
 echo -e "${YELLOW}Top 10 Memory Consuming Processes:${NC}"
 
 # Use awk to process ps output in a single pass, calculating max widths and printing formatted output
@@ -448,11 +486,13 @@ ps -eo rss,pid,user,comm --sort=-rss 2>/dev/null | head -n 11 | tail -n 10 | awk
     }
 '
 echo ""
+fi
 
 ################################################################################
 #  11. Top 10 CPU Consuming Processes
 ################################################################################
 
+if [ "${TOP_10_CPU}" = "on" ]; then
 echo -e "${YELLOW}Top 10 CPU Consuming Processes:${NC}"
 
 # Use awk to process ps output in a single pass, calculating max widths and printing formatted output
@@ -491,3 +531,4 @@ ps -eo pcpu,pid,user,comm --sort=-pcpu 2>/dev/null | head -n 11 | tail -n 10 | a
     }
 '
 echo ""
+fi
