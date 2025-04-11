@@ -6,7 +6,19 @@
 ## Features
 - Displays system time and uptime.
 - Show installed OS and kernel.
-- Shows installed software versions (Nginx, Apache, PHP, MariaDB, MySQL, Node.js, Redis, MongoDB, and more).
+- Shows installed software versions for:
+  - Nginx
+  - Apache
+  - PHP
+  - Node.js
+  - MariaDB
+  - MySQL
+  - MS SQL
+  - Apache Cassandra
+  - Apache Solr
+  - MongoDB
+  - Redis
+  - RavenDB
 - Notifies about system updates and security patches.
 - Shows logged-in users and their active sessions.
 - Displays open public network ports.
