@@ -1,27 +1,19 @@
 #!/bin/bash
 ################################################################################
-#  Script Name : Server Stats
-#  Author      : Paul Sørensen
-#  Website     : https://paulsorensen.io
-#  GitHub      : https://github.com/paulsorensen
-#  Version     : 1.2
-#  Last Update : 12.04.2025
+# Script Name   : Server Stats
+# Author        : Paul Sørensen
+# Website       : https://paulsorensen.io
+# GitHub        : https://github.com/paulsorensen
+# Version       : 1.2
+# Last Modified : 2025/04/14 01:15:10
 #
-#  Description:
-#  Provides a snapshot of key system information.
+# Description:
+# Provides a snapshot of key system information.
 #
-#  Usage:
-#  1. Set up configuration file:
-#     cp server-stats.conf.example server-stats.conf
-#  2. Make the script executable: chmod +x server-stats.sh
-#  3. Run the script: ./server-stats.conf
+# Usage: Refer to README.md for details on how to use this script.
 #
-#  Configuration:
-#  - Edit server-stats.conf and set variables to 'on' to enable features,
-#    or leave them empty to disable.
-#
-#  If you found this script useful, a small tip is appreciated ❤️
-#  https://buymeacoffee.com/paulsorensen
+# If you found this script useful, a small tip is appreciated ❤️
+# https://buymeacoffee.com/paulsorensen
 ################################################################################
 
 RED='\033[38;2;255;0;127m'
