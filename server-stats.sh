@@ -5,7 +5,7 @@
 # Website       : https://paulsorensen.io
 # GitHub        : https://github.com/paulsorensen
 # Version       : 1.2
-# Last Modified : 2025/04/14 01:15:10
+# Last Modified : 2025/05/02 02:28:27
 #
 # Description:
 # Provides a snapshot of key system information.
@@ -15,6 +15,9 @@
 # If you found this script useful, a small tip is appreciated ❤️
 # https://buymeacoffee.com/paulsorensen
 ################################################################################
+
+# Set locale to POSIX 'C' for consistent decimal formatting
+export LC_NUMERIC=C
 
 RED='\033[38;2;255;0;127m'
 BLUE='\033[38;5;81m'
@@ -38,7 +41,7 @@ source ./server-stats.conf
 if [ "${TIME}" = "on" ]; then
 # System Time & Timezone
 system_time=$(date +"%H:%M:%S")
-timezone_name=$(timedatectl | grep "Time zone" | awk '{print $3}')
+timezone_name=$(timedatectl show --value --property=Timezone)
 timezone_offset=$(date +"%z" | sed 's/\(.\)..$/\1/')
 echo -e "${YELLOW}System Time:${NC} ${system_time} (${timezone_name} GMT${timezone_offset})"
 
