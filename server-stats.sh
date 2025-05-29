@@ -5,7 +5,7 @@
 # Website       : https://paulsorensen.io
 # GitHub        : https://github.com/paulsorensen
 # Version       : 1.3
-# Last Modified : 2025/05/29 04:43:45
+# Last Modified : 2025/05/29 04:59:53
 #
 # Description:
 # Provides a snapshot of key system information.
@@ -21,6 +21,9 @@ BLUE='\033[38;5;81m'
 YELLOW='\033[38;2;223;245;13m'
 NC='\033[0m'
 echo -e "${BLUE}Server Stats by paulsorensen.io${NC}\n"
+
+# Set locale to POSIX 'C' for consistent decimal formatting
+export LC_NUMERIC=C
 
 # Get script directory
 SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
@@ -41,7 +44,7 @@ source "${SCRIPT_DIR}/server-stats.conf"
 if [ "${TIME}" = "on" ]; then
 # System Time & Timezone
 system_time=$(date +"%H:%M:%S")
-timezone_name=$(timedatectl | grep "Time zone" | awk '{print $3}')
+timezone_name=$(timedatectl show --value --property=Timezone)
 timezone_offset=$(date +"%z" | sed 's/\(.\)..$/\1/')
 echo -e "${YELLOW}System Time:${NC} ${system_time} (${timezone_name} GMT${timezone_offset})"
 
