@@ -4,8 +4,8 @@
 # Author        : Paul Sørensen
 # Website       : https://paulsorensen.io
 # GitHub        : https://github.com/paulsorensen
-# Version       : 1.2
-# Last Modified : 2025/04/14 01:15:10
+# Version       : 1.3
+# Last Modified : 2025/05/29 04:16:05
 #
 # Description:
 # Provides a snapshot of key system information.
@@ -29,7 +29,7 @@ if [ ! -f "server-stats.conf" ]; then
 fi
 
 # Include source
-source ./server-stats.conf
+source "$(dirname "${BASH_SOURCE[0]}")/server-stats.conf"
 
 ################################################################################
 #  1. Time
