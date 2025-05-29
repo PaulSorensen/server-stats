@@ -32,8 +32,7 @@
 The script requires mpstat from sysstat to be installed to fetch CPU info.
 ```bash
 sudo apt install sysstat  # For Debian/Ubuntu
-sudo dnf install sysstat  # For Fedora
-sudo yum install sysstat  # For CentOS/RHEL
+sudo dnf install sysstat  # For RHEL/Fedora
 ```
 
 ## Usage
