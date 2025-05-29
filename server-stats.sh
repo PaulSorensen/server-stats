@@ -5,7 +5,7 @@
 # Website       : https://paulsorensen.io
 # GitHub        : https://github.com/paulsorensen
 # Version       : 1.3
-# Last Modified : 2025/05/29 04:21:11
+# Last Modified : 2025/05/29 04:43:45
 #
 # Description:
 # Provides a snapshot of key system information.
@@ -16,23 +16,23 @@
 # https://buymeacoffee.com/paulsorensen
 ################################################################################
 
-# Set locale to POSIX 'C' for consistent decimal formatting
-export LC_NUMERIC=C
-
 RED='\033[38;2;255;0;127m'
 BLUE='\033[38;5;81m'
 YELLOW='\033[38;2;223;245;13m'
 NC='\033[0m'
 echo -e "${BLUE}Server Stats by paulsorensen.io${NC}\n"
 
+# Get script directory
+SCRIPT_DIR="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)"
+
 # Check if server-stats.conf exists
-if [ ! -f "server-stats.conf" ]; then
+if [ ! -f "${SCRIPT_DIR}/server-stats.conf" ]; then
   echo -e "${RED}Error: server-stats.conf file not found. Make sure to edit and rename server-stats.conf.example before you run this script${NC}"
   exit 1
 fi
 
 # Include source
-source "$(dirname "${BASH_SOURCE[0]}")/server-stats.conf"
+source "${SCRIPT_DIR}/server-stats.conf"
 
 ################################################################################
 #  1. Time
@@ -41,7 +41,7 @@ source "$(dirname "${BASH_SOURCE[0]}")/server-stats.conf"
 if [ "${TIME}" = "on" ]; then
 # System Time & Timezone
 system_time=$(date +"%H:%M:%S")
-timezone_name=$(timedatectl show --value --property=Timezone)
+timezone_name=$(timedatectl | grep "Time zone" | awk '{print $3}')
 timezone_offset=$(date +"%z" | sed 's/\(.\)..$/\1/')
 echo -e "${YELLOW}System Time:${NC} ${system_time} (${timezone_name} GMT${timezone_offset})"
 
